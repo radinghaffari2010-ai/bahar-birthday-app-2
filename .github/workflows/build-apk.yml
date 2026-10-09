@@ -79,6 +79,79 @@ jobs:
           print("Custom icon installed successfully")
           '
 
+      - name: Add Bahar Radio and Newspaper page
+        run: |
+          ASSETS_DIR=$(find extracted -type d -name assets -print -quit)
+
+          if [ -z "$ASSETS_DIR" ]; then
+            ASSETS_DIR="extracted/app/src/main/assets"
+            mkdir -p "$ASSETS_DIR"
+          fi
+
+          cp bahar.jpg "$ASSETS_DIR/bahar.jpg"
+
+          cat > "$ASSETS_DIR/radio-bahar.html" <<'EOF'
+          <!doctype html>
+          <html lang="fa" dir="rtl">
+          <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>رادیو و روزنامهٔ بهار</title>
+          <style>
+            body{margin:0;font-family:Tahoma,sans-serif;background:#120726;color:#fff}
+            .wrap{max-width:520px;margin:auto;padding:24px}
+            h1{color:#ffd166;text-align:center}
+            .card{background:#1e1038;border-radius:20px;padding:18px;margin-bottom:18px;box-shadow:0 8px 24px #0006}
+            img{width:100%;border-radius:16px}
+            .news{line-height:2}
+            audio{width:100%;margin-top:10px}
+            .song{margin-top:14px}
+            .date{text-align:center;color:#c9b8ff;margin-top:-6px}
+          </style>
+          </head>
+          <body>
+          <div class="wrap">
+
+            <h1>📻 رادیو بهار</h1>
+            <div class="card">
+              <p>برای بهار عزیز، با عشق 🤍</p>
+
+              <div class="song">
+                <b>آهنگ ۱</b><br>
+                <audio controls src="SONG_1"></audio>
+              </div>
+
+              <div class="song">
+                <b>آهنگ ۲</b><br>
+                <audio controls src="SONG_2"></audio>
+              </div>
+
+              <div class="song">
+                <b>آهنگ ۳</b><br>
+                <audio controls src="SONG_3"></audio>
+              </div>
+            </div>
+
+            <h1>📰 روزنامهٔ بهار</h1>
+            <div class="card">
+              <p class="date">ویژهٔ تولد بهار</p>
+              <img src="bahar.jpg" alt="بهار">
+              <h2>بهار امروز متولد شد!</h2>
+              <div class="news">
+                <p>🔹 منابع موثق تأیید کردند: لبخند بهار همچنان رکورد جهانی خود را حفظ کرده است.</p>
+                <p>🔹 گزارش‌ها حاکی از آن است که حضور بهار، حال همهٔ اطرافیانش را به‌طرز چشمگیری بهتر می‌کند.</p>
+                <p>🔹 پیش‌بینی می‌شود امسال نیز بهترین روزهای بهار، در کنار دوستان و عزیزانش رقم بخورد.</p>
+              </div>
+              <p style="text-align:center;color:#ffd166">تولدت مبارک بهار 🎂✨</p>
+            </div>
+
+          </div>
+          </body>
+          </html>
+          EOF
+
+          echo "Radio and newspaper page added."
+
       - name: Build APK
         run: |
           PROJECT_FILE=$(find extracted -type f ( -name settings.gradle -o -name settings.gradle.kts ) -print -quit)
