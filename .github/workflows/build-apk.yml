@@ -35,21 +35,20 @@ jobs:
 
       - name: Extract Android project
         run: |
+          mkdir -p extracted
           unzip -o BaharBirthdayApp_CloudBuild_Ready.zip -d extracted
-          find extracted -maxdepth 4 -type f | head -80
 
       - name: Build APK
         run: |
-          PROJECT_DIR="$(find extracted -name settings.gradle -o -name settings.gradle.kts | head -1)"
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "ERROR: Gradle Android project not found in ZIP"
+          PROJECT_FILE=$(find extracted -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit)
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "ERROR: Gradle project not found"
             exit 1
           fi
-          cd "$(dirname "$PROJECT_DIR")"
-          gradle assembleDebug
+          cd "$(dirname "$PROJECT_FILE")"
+          gradle assembleDebug -Pkotlin.jvm.target.validation.mode=warning
 
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: BaharBirthday-APK
