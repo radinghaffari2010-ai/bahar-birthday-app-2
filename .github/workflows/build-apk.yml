@@ -7,6 +7,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,20 +22,33 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Extract Android project
+        run: |
+          mkdir -p extracted
+          unzip -o BaharBirthdayApp_CloudBuild_Ready.zip -d extracted
 
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x gradlew
+      - name: Find Android project
+        run: |
+          find extracted -type f \( -name "gradlew" -o -name "settings.gradle" -o -name "settings.gradle.kts" \)
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          PROJECT_DIR=$(find extracted -type f -name "gradlew" -print -quit | xargs -r dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: gradlew was not found in the extracted ZIP."
+            exit 1
+          fi
+
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: bahar-birthday-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: extracted/**/build/outputs/apk/debug/*.apk
           if-no-files-found: error
